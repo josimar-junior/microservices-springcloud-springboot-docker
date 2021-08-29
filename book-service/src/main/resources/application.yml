@@ -12,3 +12,7 @@ spring:
     url: jdbc:postgresql://localhost:5433/book_service
     username: bookservice
     password: bookservice
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka

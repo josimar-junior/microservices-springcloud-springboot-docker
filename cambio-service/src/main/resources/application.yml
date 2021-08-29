@@ -12,3 +12,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/cambio_service
     username: cambioservice
     password: cambioservice
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
