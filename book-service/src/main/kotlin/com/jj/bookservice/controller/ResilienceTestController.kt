@@ -15,11 +15,13 @@ class ResilienceTestController {
     private val logger: Logger = LoggerFactory.getLogger(ResilienceTestController::class.java)
 
     @GetMapping("resilience")
-    @Retry(name = "resilience")
+    @Retry(name = "resilience", fallbackMethod = "fallbackMethod")
     fun resilience(): String? {
         logger.info("Request to resilience is received!")
         val response = RestTemplate()
             .getForEntity("http://localhost:8080/test", String::class.java)
         return response.body
     }
+
+    fun fallbackMethod(e: Exception) : String = "fallbackMethod : " + e.message
 }
