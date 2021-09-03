@@ -1,5 +1,6 @@
 package com.jj.bookservice.controller
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker
 import io.github.resilience4j.retry.annotation.Retry
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -15,7 +16,8 @@ class ResilienceTestController {
     private val logger: Logger = LoggerFactory.getLogger(ResilienceTestController::class.java)
 
     @GetMapping("resilience")
-    @Retry(name = "resilience", fallbackMethod = "fallbackMethod")
+    //@Retry(name = "resilience", fallbackMethod = "fallbackMethod")
+    @CircuitBreaker(name = "default", fallbackMethod = "fallbackMethod")
     fun resilience(): String? {
         logger.info("Request to resilience is received!")
         val response = RestTemplate()
