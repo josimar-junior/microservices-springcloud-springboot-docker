@@ -32,3 +32,7 @@ resilience4j:
     instances:
       default:
         max-current-calls: 10
+springdoc:
+  show-actuator: true
+  api-docs:
+    path: book-service/v3/api-docs

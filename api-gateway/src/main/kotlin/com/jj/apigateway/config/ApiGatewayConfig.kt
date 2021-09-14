@@ -6,10 +6,10 @@ import org.springframework.cloud.gateway.route.builder.routes
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
-@Configuration
-class ApiGatewayConfig {
+//@Configuration
+class ApiGatewayConfig {}
 
-    @Bean
+    /*@Bean
     fun gatewayRouter(builder: RouteLocatorBuilder): RouteLocator  =
         builder.routes {
             route {
@@ -20,5 +20,4 @@ class ApiGatewayConfig {
                 path("/book-service/**")
                 uri("lb://book-service")
             }
-        }
-}
+        }*/
