@@ -4,6 +4,8 @@ import com.jj.cambioservice.model.Cambio;
 import com.jj.cambioservice.service.CambioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,8 @@ import java.math.RoundingMode;
 @Tag(name = "Cambio endpoint")
 public class CambioController {
 
+    private Logger logger = LoggerFactory.getLogger(CambioController.class);
+
     @Autowired
     private Environment environment;
 
@@ -31,6 +35,8 @@ public class CambioController {
     public ResponseEntity<Cambio> getCambio(@PathVariable BigDecimal amount,
                                             @PathVariable String from,
                                             @PathVariable String to) {
+
+        logger.info("getCambio is called with -> {}, {} and {}", amount, from, to);
 
         var port = environment.getProperty("local.server.port");
         var cambio = service.findByFromAndTo(from, to);

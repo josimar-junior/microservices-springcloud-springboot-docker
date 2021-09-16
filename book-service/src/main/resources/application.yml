@@ -12,6 +12,9 @@ spring:
     url: jdbc:postgresql://localhost:5433/book_service
     username: bookservice
     password: bookservice
+  sleuth:
+    sampler:
+      probability: 1.0
 eureka:
   client:
     service-url:

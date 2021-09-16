@@ -12,6 +12,9 @@ spring:
     url: jdbc:postgresql://localhost:5432/cambio_service
     username: cambioservice
     password: cambioservice
+  sleuth:
+    sampler:
+      probability: 1.0
 eureka:
   client:
     service-url:
