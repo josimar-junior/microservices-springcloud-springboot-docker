@@ -1,0 +1,33 @@
+version: '3.4'
+
+services:
+
+  zipkin-server:
+    image: openzipkin/zipkin:2.23.2
+    ports:
+      - 9411:9411
+    networks:
+      - jj-network
+
+  eureka-server:
+    image: 967049/eureka-server:1.0
+    ports:
+      - 8761:8761
+    networks:
+      - jj-network
+
+  api-gateway:
+    image: 967049/api-gateway:1.0
+    ports:
+      - 8765:8765
+    depends_on:
+      - eureka-server
+    environment:
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://eureka-server:8761/eureka
+      SPRING.ZIPKIN.BASEURL: http://zipkin-server:9411/
+    networks:
+      - jj-network
+
+networks:
+  jj-network:
+    driver: bridge
