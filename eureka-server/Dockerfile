@@ -5,8 +5,12 @@ VOLUME /tmp
 
 ENV LANG C.UTF-8
 
-ADD build/libs/*.jar /app/app.jar
+ARG JAR_FILE=eureka-server/build/libs/*.jar
+
+COPY ${JAR_FILE} app.jar
+
+RUN bash -c 'touch /app.jar'
 
 EXPOSE 8761
 
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+ENTRYPOINT ["java", "-jar", "/app.jar"]

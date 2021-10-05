@@ -2,6 +2,30 @@ version: '3.4'
 
 services:
 
+  cambio-db:
+    image: postgres:10.5-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=cambioservice
+      - POSTGRES_PASSWORD=cambioservice
+      - POSTGRES_DB=cambio_service
+    ports:
+      - 5432:5432
+    networks:
+      - jj-network
+
+  book-db:
+    image: postgres:10.5-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=bookservice
+      - POSTGRES_PASSWORD=bookservice
+      - POSTGRES_DB=book_service
+    ports:
+      - 5433:5432
+    networks:
+      - jj-network
+
   zipkin-server:
     image: openzipkin/zipkin:2.23.2
     ports:
@@ -10,21 +34,84 @@ services:
       - jj-network
 
   eureka-server:
-    image: 967049/eureka-server:1.0
+    image: 967049/eureka-server
+    restart: always
+    build:
+      context: .
+      dockerfile: eureka-server/Dockerfile
     ports:
       - 8761:8761
     networks:
       - jj-network
 
   api-gateway:
-    image: 967049/api-gateway:1.0
+    image: 967049/api-gateway
+    restart: always
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    environment:
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://eureka-server:8761/eureka
+      SPRING.ZIPKIN.BASEURL: http://zipkin-server:9411/
     ports:
       - 8765:8765
     depends_on:
       - eureka-server
+    networks:
+      - jj-network
+
+  api-gateway:
+    image: 967049/api-gateway
+    restart: always
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
     environment:
+      TZ: America/Sao_Paulo
       EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://eureka-server:8761/eureka
       SPRING.ZIPKIN.BASEURL: http://zipkin-server:9411/
+    ports:
+      - 8765:8765
+    depends_on:
+      - eureka-server
+    networks:
+      - jj-network
+
+  cambio-service:
+    image: 967049/cambio-service
+    restart: always
+    build:
+      context: .
+      dockerfile: cambio-service/Dockerfile
+    environment:
+      TZ: America/Sao_Paulo
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://eureka-server:8761/eureka
+      SPRING.ZIPKIN.BASEURL: http://zipkin-server:9411/
+      SPRING.DATASOURCE.URL: jdbc:postgresql://cambio-db/cambio_service
+    ports:
+      - 8000:8000
+    depends_on:
+      - eureka-server
+      - cambio-db
+    networks:
+      - jj-network
+ 
+  book-service:
+    image: 967049/book-service
+    restart: always
+    build:
+      context: .
+      dockerfile: book-service/Dockerfile
+    environment:
+      TZ: America/Sao_Paulo
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://eureka-server:8761/eureka
+      SPRING.ZIPKIN.BASEURL: http://zipkin-server:9411/
+      SPRING.DATASOURCE.URL: jdbc:postgresql://book-db/book_service
+    ports:
+      - 8100:8100
+    depends_on:
+      - eureka-server
+      - book-db
     networks:
       - jj-network
 
