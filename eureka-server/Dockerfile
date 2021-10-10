@@ -5,7 +5,7 @@ VOLUME /tmp
 
 ENV LANG C.UTF-8
 
-ARG JAR_FILE=eureka-server/build/libs/*.jar
+ARG JAR_FILE=eureka-server/build/libs/eureka-server-0.0.1-SNAPSHOT.jar
 
 COPY ${JAR_FILE} app.jar
 
