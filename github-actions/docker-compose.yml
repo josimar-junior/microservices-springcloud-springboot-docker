@@ -1,0 +1,117 @@
+version: '3.4'
+
+services:
+
+  cambio-db:
+    image: postgres:10.5-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=cambioservice
+      - POSTGRES_PASSWORD=cambioservice
+      - POSTGRES_DB=cambio_service
+    ports:
+      - 5432:5432
+    networks:
+      - jj-network
+
+  book-db:
+    image: postgres:10.5-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=bookservice
+      - POSTGRES_PASSWORD=bookservice
+      - POSTGRES_DB=book_service
+    ports:
+      - 5433:5432
+    networks:
+      - jj-network
+
+  zipkin-server:
+    image: openzipkin/zipkin:2.23.2
+    ports:
+      - 9411:9411
+    restart: always
+    depends_on:
+      - rabbit-mq
+    environment:
+      RABBIT_URI: amqp://guest:guest@rabbit-mq:5672
+    networks:
+      - jj-network
+
+  rabbit-mq:
+    image: rabbitmq:3.8.14-management
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - jj-network
+
+  eureka-server:
+    image: 967049/eureka-server:latest
+    restart: always
+    ports:
+      - 8761:8761
+    networks:
+      - jj-network
+
+  api-gateway:
+    image: 967049/api-gateway:latest
+    restart: always
+    environment:
+      TZ: America/Sao_Paulo
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://eureka-server:8761/eureka
+      SPRING.ZIPKIN.BASEURL: http://zipkin-server:9411/
+      RABBIT_URI: amqp://guest:guest@rabbit-mq:5672
+      SPRING_RABBITMQ_HOST: rabbit-mq
+      SPRING_ZIPKIN_SENDER_TYPE: rabbit
+    ports:
+      - 8765:8765
+    depends_on:
+      - eureka-server
+      - rabbit-mq
+    networks:
+      - jj-network
+
+  cambio-service:
+    image: 967049/cambio-service:latest
+    restart: always
+    environment:
+      TZ: America/Sao_Paulo
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://eureka-server:8761/eureka
+      SPRING.ZIPKIN.BASEURL: http://zipkin-server:9411/
+      RABBIT_URI: amqp://guest:guest@rabbit-mq:5672
+      SPRING_RABBITMQ_HOST: rabbit-mq
+      SPRING_ZIPKIN_SENDER_TYPE: rabbit
+      SPRING.DATASOURCE.URL: jdbc:postgresql://cambio-db/cambio_service
+    ports:
+      - 8000:8000
+    depends_on:
+      - eureka-server
+      - cambio-db
+      - rabbit-mq
+    networks:
+      - jj-network
+ 
+  book-service:
+    image: 967049/book-service:latest
+    restart: always
+    environment:
+      TZ: America/Sao_Paulo
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://eureka-server:8761/eureka
+      SPRING.ZIPKIN.BASEURL: http://zipkin-server:9411/
+      RABBIT_URI: amqp://guest:guest@rabbit-mq:5672
+      SPRING_RABBITMQ_HOST: rabbit-mq
+      SPRING_ZIPKIN_SENDER_TYPE: rabbit
+      SPRING.DATASOURCE.URL: jdbc:postgresql://book-db/book_service
+    ports:
+      - 8100:8100
+    depends_on:
+      - eureka-server
+      - book-db
+      - rabbit-mq
+    networks:
+      - jj-network
+
+networks:
+  jj-network:
+    driver: bridge
