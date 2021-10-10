@@ -23,11 +23,11 @@ jobs:
          
       - name: Build Eureka Server Jar
         working-directory: ./eureka-server
-        run: ./gradlew build
+        run: ./gradlew build -x test
 
       - name: Build API Gateway Jar
         working-directory: ./api-gateway
-        run: ./gradlew build
+        run: ./gradlew build -x test
         
       - name: Build Cambio Microservice Jar
         working-directory: ./cambio-service
@@ -35,7 +35,7 @@ jobs:
         
       - name: Build Book Microservice Jar
         working-directory: ./book-service
-        run: ./gradlew build
+        run: ./gradlew build -x test
         
       - name: Docker Compose Build
         working-directory: .
