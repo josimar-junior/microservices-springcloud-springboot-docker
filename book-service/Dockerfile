@@ -5,7 +5,7 @@ VOLUME /tmp
 
 ENV LANG C.UTF-8
 
-ARG JAR_FILE=book-service/build/libs/*.jar
+ARG JAR_FILE=book-service/build/libs/book-service-0.0.1-SNAPSHOT.jar
 
 COPY ${JAR_FILE} app.jar
 
